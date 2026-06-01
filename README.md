@@ -2,8 +2,6 @@
 
 A simulated decision engine for improving Meta ads efficiency across a high-volume account. The system recommends which ads to stop, trim, scale, hold, or use as the basis for new creative briefs.
 
-This repo was built for the AppliedAI Studio AI Builder assignment.
-
 ## What this project does
 
 The assignment describes a customer running roughly 10,000 Facebook and Instagram campaigns per month and asks for a system to improve ROAS. Because no real account dataset was provided, this repo includes a simulator that creates Meta-style ad data and hidden ground truth.
