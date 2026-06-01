@@ -1,0 +1,305 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Meta ads efficiency engine</title>
+<style>
+@page {
+  size: A4;
+  margin: 17mm 16mm 17mm 16mm;
+  @bottom-center { content: counter(page); font-family: Arial, sans-serif; font-size: 8.5pt; color: #64748b; }
+}
+* { box-sizing: border-box; }
+body { font-family: Arial, Helvetica, sans-serif; color: #111827; font-size: 10.2pt; line-height: 1.34; }
+h1 { font-size: 31pt; line-height: 1.02; letter-spacing: -0.7pt; margin: 0 0 8px; color: #0f172a; }
+h2 { font-size: 19pt; letter-spacing: -0.2pt; margin: 0 0 8px; padding-bottom: 7px; border-bottom: 1.4px solid #cbd5e1; color: #0f172a; }
+h3 { font-size: 12.1pt; margin: 12px 0 6px; color: #0f172a; }
+p { margin: 0 0 8px; }
+a { color: #0f172a; text-decoration: none; }
+.page { break-after: page; min-height: 250mm; }
+.page:last-child { break-after: auto; }
+h2, h3 { break-after: avoid; }
+table, .card, .flow, .diagram, .case, .mini { break-inside: avoid; }
+.name { color: #475569; font-size: 11pt; margin: 2px 0 36px; }
+.contents { width: 100%; border-collapse: collapse; margin-top: 18px; font-size: 10.4pt; }
+.contents td { border-bottom: 1px solid #e5e7eb; padding: 10px 4px; vertical-align: top; }
+.contents td:first-child { width: 34px; color: #64748b; font-weight: 700; }
+.contents td:nth-child(2) { width: 235px; font-weight: 700; color: #0f172a; }
+.contents td:nth-child(3) { color: #475569; }
+.overview { border-left: 3px solid #94a3b8; padding: 7px 0 7px 12px; margin: 0 0 14px; color: #334155; background: #f8fafc; }
+.overview b { color: #0f172a; }
+.note { border: 1px solid #dbeafe; background: #eff6ff; border-radius: 9px; padding: 10px 12px; margin: 10px 0 12px; }
+.warn { border: 1px solid #fcd34d; background: #fffbeb; border-radius: 9px; padding: 10px 12px; margin: 10px 0 12px; }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 9px 0; }
+.grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin: 10px 0; }
+.card { border: 1px solid #d7dee8; border-radius: 10px; padding: 10px 11px; background: #fff; }
+.card h3 { margin-top: 0; }
+.metric { font-size: 23pt; font-weight: 800; color: #0f172a; margin-bottom: 2px; letter-spacing: -0.4pt; }
+.muted { color: #475569; font-size: 9pt; }
+.small { font-size: 8.5pt; color: #475569; }
+table { width: 100%; border-collapse: collapse; margin: 10px 0 12px; font-size: 8.9pt; }
+th { background: #111827; color: white; text-align: left; padding: 7px 8px; font-weight: 700; }
+td { border: 1px solid #d1d5db; padding: 7px 8px; vertical-align: top; }
+.tight { font-size: 8.25pt; }
+.tight td, .tight th { padding: 6px 7px; }
+ul { margin: 5px 0 10px 18px; padding: 0; }
+li { margin-bottom: 4px; }
+.flow { margin: 12px 0; }
+.flowline { display: grid; grid-template-columns: 1fr 38px 1fr 38px 1fr; align-items: center; gap: 0; margin: 8px 0; }
+.flowbox { border: 1px solid #cbd5e1; background: #f8fafc; border-radius: 11px; padding: 10px; min-height: 72px; text-align: center; }
+.flowbox b { display: block; margin-bottom: 4px; color: #0f172a; }
+.arrow { text-align: center; color: #64748b; font-size: 16pt; }
+.diagram { border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px 14px; background: #ffffff; margin: 10px 0 14px; }
+.algobox { border: 1px solid #cbd5e1; background: #f8fafc; border-radius: 10px; padding: 7px 10px; margin: 6px auto; width: 84%; text-align: center; }
+.algobox b { display:block; margin-bottom: 2px; }
+.down { text-align:center; color:#64748b; font-size:12pt; line-height:0.7; margin:0; }
+.archrow { display: grid; grid-template-columns: 1fr 28px 1fr 28px 1fr 28px 1fr; align-items: center; gap: 0; margin-top: 8px; }
+.archbox { border: 1px solid #cbd5e1; border-radius: 10px; padding: 9px 7px; min-height: 72px; text-align: center; background: #f8fafc; font-size: 8.9pt; }
+.archbox b { display: block; margin-bottom: 3px; }
+.sidecar { width: 55%; margin: 12px auto 0; border: 1px solid #c4b5fd; background: #f5f3ff; border-radius: 10px; padding: 9px; text-align: center; font-size: 9pt; }
+.failrow { display: grid; grid-template-columns: 1fr 30px 1fr 30px 1fr; gap: 0; align-items: center; margin: 8px 0; }
+.failbox { border:1px solid #cbd5e1; border-radius:10px; padding: 9px; min-height: 66px; text-align:center; background:#f8fafc; font-size:9pt; }
+.pill { display: inline-block; font-size: 8pt; padding: 2px 7px; border-radius: 999px; font-weight: 700; }
+.red { background:#fee2e2; color:#991b1b; }
+.amber { background:#fef3c7; color:#92400e; }
+.green { background:#dcfce7; color:#166534; }
+.code { font-family: 'Courier New', monospace; white-space: pre-wrap; font-size: 8.6pt; border: 1px solid #e2e8f0; background: #f8fafc; border-radius: 9px; padding: 9px 10px; margin: 8px 0; }
+.footer-note { font-size: 8.3pt; color: #475569; margin-top: 16px; }
+.exec-diagram-img { width: 100%; max-height: 138mm; object-fit: contain; display: block; border: 1px solid #d7dee8; border-radius: 12px; margin: 10px 0 12px; background: #fff; }
+.caption { font-size: 8.4pt; color: #64748b; margin: -5px 0 10px; }
+
+</style>
+</head>
+<body>
+
+<section class="page" id="contents">
+  <h1>Meta ads efficiency engine</h1>
+  <div class="name">Harshitha Akkineni</div>
+  <h2>Contents</h2>
+  <table class="contents">
+    <tr><td>1</td><td><a href="#summary">End-to-end summary</a></td><td>What the system does, why it is guarded, and what the simulator showed.</td></tr>
+    <tr><td>2</td><td><a href="#problem">Problem statement and understanding</a></td><td>Why this is a decision-quality problem, not just a ROAS dashboard problem.</td></tr>
+    <tr><td>3</td><td><a href="#assumptions">Assumptions</a></td><td>The simulated brand, campaign stages, ad types, and business constraints.</td></tr>
+    <tr><td>4</td><td><a href="#dataset">Dataset source and insights</a></td><td>What data was used, where it came from, what the engine can and cannot know.</td></tr>
+    <tr><td>5</td><td><a href="#approach">Approach and rejected alternatives</a></td><td>Why ROAS sorting, an LLM media buyer, MMM-first, and auto-execution were rejected.</td></tr>
+    <tr><td>6</td><td><a href="#algorithm">Recommendation algorithm</a></td><td>The full decision flow for stop, decrease, increase, hold, and create recommendations.</td></tr>
+    <tr><td>7</td><td><a href="#examples">Dataset examples and test cases</a></td><td>Concrete simulated rows used to validate stop, hold, and increase behavior.</td></tr>
+    <tr><td>8</td><td><a href="#failures">Failed test cases and evaluation</a></td><td>What failed cases reveal about naive ROAS rules and the engine's conservative tradeoff.</td></tr>
+    <tr><td>9</td><td><a href="#architecture">Architecture</a></td><td>The system diagram, AI sidecar, audit log, and failure-handling path.</td></tr>
+    <tr><td>10</td><td><a href="#production">AI boundary and production readiness</a></td><td>Where AI is used, where it is blocked, interface design, security, and deployment questions.</td></tr>
+  </table>
+</section>
+
+<section class="page" id="summary">
+  <h2>1. End-to-end summary</h2>
+  <div class="overview"><b>Section overview:</b> The proposed system is a guarded recommendation engine for Meta ads. It recommends stop, decrease, increase, hold, and create actions, but keeps human approval in the loop.</div>
+  <img class="exec-diagram-img" src="file:///mnt/data/c176fc42-3f64-4ad4-81b0-db37ca27c0db.png" alt="System diagram: guarded Meta ads efficiency engine">
+  <p class="caption">Visual overview of the recommendation-only v1 system: Meta data becomes scored recommendations, AI stays outside budget authority, and Slack/email is used for human review.</p>
+  <p>The assignment is to improve ROAS for a brand running close to 10,000 Meta campaigns a month across Facebook and Instagram. I treated this as a decision system problem, not a reporting problem. At that scale, the hard part is not calculating ROAS. The hard part is deciding which ROAS numbers are mature enough to trust and which budget movements are safe to recommend.</p>
+  <p>The solution is a daily recommendation engine. It ingests Meta-style campaign, ad set, creative, spend, and conversion data; checks whether the signal is mature; estimates confidence-adjusted marginal ROAS; applies business guardrails; and sends human-reviewable recommendations through Slack or email.</p>
+  <div class="note"><b>Core thesis:</b> Do not optimize historical average ROAS in isolation. Estimate whether the next rupee of spend is likely to work, then apply maturity, attribution, fatigue, inventory, learning-phase, and approval guardrails before recommending a budget move.</div>
+  <div class="grid3">
+    <div class="card"><div class="metric">1.5%</div><b>Engine false pause rate</b><div class="muted">Compared with 16.8% for a simple ROAS rule.</div></div>
+    <div class="card"><div class="metric">5.4%</div><b>Engine wrong scale rate</b><div class="muted">Compared with 8.2% for a simple ROAS rule.</div></div>
+    <div class="card"><div class="metric">34.8%</div><b>Engine missed scale rate</b><div class="muted">Higher by design because v1 is conservative.</div></div>
+  </div>
+</section>
+
+<section class="page" id="problem">
+  <h2>2. Problem statement and understanding</h2>
+  <div class="overview"><b>Section overview:</b> The business problem is not that the team lacks ROAS. The problem is that manual judgment does not scale to 10,000 campaigns a month.</div>
+  <p>The straightforward reading of the assignment is: improve ad efficiency and ROAS. My interpretation is more specific: build a system that improves the quality of daily campaign decisions. A useful system should not merely rank ads by ROAS. It should decide whether each ad has been tested fairly, whether attribution has matured, whether the audience is saturating, and whether the next rupee of spend is likely to return more than the business target.</p>
+  <p>A pure ROAS rule is unreliable because Meta performance data is noisy. A small ad can show great ROAS after three lucky purchases. A young ad can look weak because delayed conversions have not arrived yet. A retargeting ad can look stronger than it really is because the audience already intended to purchase. A historically good ad can become a bad scale candidate when frequency rises and marginal returns flatten.</p>
+  <p>The system therefore needs to answer four operating questions every day. Which ads should be stopped because they have had a fair test and are unlikely to recover? Which budgets should be decreased because incremental spend is likely to perform worse than alternatives? Which budgets should be increased because marginal ROAS is still above target? Which new ads should be created because a winning creative pattern is under-covered or close to fatigue?</p>
+  <div class="grid2">
+    <div class="card"><h3>What the system optimizes</h3><p>It optimizes expected incremental value from the next budget decision, not historical average ROAS alone.</p></div>
+    <div class="card"><h3>What the system protects against</h3><p>It protects against stopping recoverable ads too early and scaling noisy winners before the signal is mature.</p></div>
+  </div>
+  <table>
+    <tr><th>Action</th><th>Meaning in the system</th></tr>
+    <tr><td>Stop</td><td>The ad has mature signal, is below target, and shows fatigue or saturation.</td></tr>
+    <tr><td>Decrease</td><td>The ad is not necessarily dead, but the next rupee is likely better used elsewhere.</td></tr>
+    <tr><td>Increase</td><td>The ad has mature signal, healthy frequency, and marginal ROAS above target.</td></tr>
+    <tr><td>Create</td><td>A winning product, audience, or creative pattern is under-covered or fatiguing.</td></tr>
+    <tr><td>Hold</td><td>The signal is not mature enough or business constraints block action.</td></tr>
+  </table>
+</section>
+
+<section class="page" id="assumptions">
+  <h2>3. Assumptions</h2>
+  <div class="overview"><b>Section overview:</b> No real customer account or dataset was provided, so the solution uses explicit assumptions about the brand, ad types, campaign stages, and economics.</div>
+  <p>I assumed the customer is a multi-category consumer brand selling through Facebook and Instagram ads. I did not assume one product because the assignment mentions campaign scale, not a specific industry. A multi-category D2C account is more useful for testing because it creates different margins, conversion delays, creative formats, and audience dynamics.</p>
+  <p>The simulated product categories are beauty and skincare, apparel, home and lifestyle, electronics accessories, and supplements. These categories were chosen because they behave differently in Meta advertising. Skincare may convert quickly but has stricter claim constraints. Apparel is often creative-led and promotion-sensitive. Home and electronics accessories can have different price points and longer consideration windows. Supplements can look strong in direct response but require careful claim safety.</p>
+  <p>The simulated campaign stages are prospecting, retargeting, and retention. I kept these separate because their ROAS numbers are not directly comparable. Retargeting often looks stronger inside ad platforms because the audience already has intent. Prospecting may look weaker on immediate ROAS but can be more important for new customer growth.</p>
+  <table>
+    <tr><th>Assumption</th><th>How it is represented</th><th>Why it matters</th></tr>
+    <tr><td>Brand type</td><td>Multi-category consumer brand</td><td>More realistic than one generic product when testing 10,000 campaigns.</td></tr>
+    <tr><td>Campaign stages</td><td>Prospecting, retargeting, retention</td><td>Different stages need different confidence and attribution treatment.</td></tr>
+    <tr><td>Creative formats</td><td>UGC reel, static image, carousel, demo, testimonial, comparison, offer-led ad</td><td>Needed for the create-new-ads recommendation.</td></tr>
+    <tr><td>Economics</td><td>Product-level margins and target ROAS assumptions</td><td>Budget decisions should optimize business economics, not one universal threshold.</td></tr>
+    <tr><td>Execution mode</td><td>Recommendation-only in v1</td><td>Human approval reduces risk before any Meta writeback is enabled.</td></tr>
+  </table>
+  <div class="warn"><b>Important:</b> These assumptions are not presented as facts about a real customer account. They are the operating assumptions used to make the assignment testable without access to customer data.</div>
+</section>
+
+<section class="page" id="dataset">
+  <h2>4. Dataset source and insights</h2>
+  <div class="overview"><b>Section overview:</b> The dataset used for evaluation is synthetic. It is designed to resemble Meta ad-account data and includes hidden truth so recommendations can be scored.</div>
+  <p>No real account dataset was provided. I therefore built a simulator instead of only describing an architecture. The simulated dataset contains observed fields that the engine can see and hidden fields that only the evaluator can see. This matters because real ad optimization is counterfactual: to know whether a stop or scale recommendation was good, we need some estimate of what would have happened otherwise.</p>
+  <p>The observed layer resembles what a Meta operator would usually inspect: campaign stage, ad age, spend, impressions, clicks, purchases, revenue, CTR, CPC, CPM, frequency, raw ROAS, and creative format. The hidden layer contains true marginal ROAS and future ROAS. The engine never sees the hidden layer. It is used only for evaluation.</p>
+  <table class="tight">
+    <tr><th>Data source</th><th>Role in the project</th><th>Limit</th></tr>
+    <tr><td>Simulated account data</td><td>Main evaluation dataset for 10,000 campaigns and 120,000 ads.</td><td>Useful for testing logic, but not a live lift claim.</td></tr>
+    <tr><td>Meta-style schema assumptions</td><td>Field design for spend, impressions, clicks, conversions, revenue, and creative metadata.</td><td>Schema sanity only; not customer performance data.</td></tr>
+    <tr><td>Hidden ground truth in simulator</td><td>Lets the evaluator score false pauses, wrong scales, and missed scales.</td><td>Only available because this is a simulator.</td></tr>
+  </table>
+  <h3>Key dataset insights used by the engine</h3>
+  <ul>
+    <li>Low spend can create fake winners because one or two purchases can produce very high ROAS.</li>
+    <li>Young ads can create fake losers because conversions may arrive after the first few days.</li>
+    <li>Retargeting can inflate platform ROAS because some users would have purchased anyway.</li>
+    <li>High frequency and CTR decline are useful warning signs for fatigue and saturation.</li>
+    <li>Average ROAS and marginal ROAS can disagree; budget decisions should care more about marginal ROAS.</li>
+  </ul>
+  <div class="grid3">
+    <div class="card"><b>Campaigns</b><div class="metric">10,000</div><div class="muted">Simulated monthly scale.</div></div>
+    <div class="card"><b>Ads</b><div class="metric">120,000</div><div class="muted">Used for recommendation testing.</div></div>
+    <div class="card"><b>Mature ads</b><div class="metric">84,822</div><div class="muted">Eligible for stronger decisions.</div></div>
+  </div>
+</section>
+
+<section class="page" id="approach">
+  <h2>5. Approach and rejected alternatives</h2>
+  <div class="overview"><b>Section overview:</b> I rejected approaches that are easy to build but unsafe for financial decisions. The chosen approach is guarded, explainable, and recommendation-first.</div>
+  <p>The simplest approach is to sort by ROAS. I rejected it because ROAS is noisy at low spend, delayed by attribution windows, inflated by retargeting overlap, distorted by promotions, and backward-looking. It moves money too confidently on incomplete signal.</p>
+  <p>I also rejected using an LLM as a media buyer. AI can summarize, explain, classify creatives, and draft new creative briefs. It should not decide whether money moves. Budget decisions need deterministic rules, reason codes, confidence, and an audit trail.</p>
+  <p>A full marketing mix model was not the right first version either. MMM-style thinking is useful for saturation and diminishing returns, but a full MMM-first approach is too heavy for daily ad-level recommendations and needs longer cross-channel history than the assignment provides.</p>
+  <p>I also rejected automatic execution on day one. The customer has access to APIs and MCP-style tools, so automation may be possible later. But the first version should recommend and explain. Execution should come after the system proves that its confidence scores are calibrated.</p>
+  <table>
+    <tr><th>Alternative</th><th>Why it is tempting</th><th>Why I rejected it for v1</th></tr>
+    <tr><td>Pure ROAS sorting</td><td>Fast, simple, easy to explain.</td><td>Too brittle under low spend, delayed attribution, and retargeting inflation.</td></tr>
+    <tr><td>LLM media buyer</td><td>Looks powerful and flexible.</td><td>Unsafe for direct budget decisions and hard to audit.</td></tr>
+    <tr><td>MMM-first</td><td>Good for strategic spend-response questions.</td><td>Too slow and heavy for daily ad-level action.</td></tr>
+    <tr><td>Auto-execution first</td><td>Maximizes automation.</td><td>Too risky before confidence calibration and approval controls exist.</td></tr>
+  </table>
+  <div class="note"><b>Final choice:</b> A guarded recommendation engine that is deterministic for financial decisions, AI-assisted for explanation and creative work, and human-approved before action.</div>
+</section>
+
+<section class="page" id="algorithm">
+  <h2>6. Recommendation algorithm</h2>
+  <div class="overview"><b>Section overview:</b> The algorithm is a gated decision flow. It blocks action when data is weak and only recommends budget movement after signal maturity, economics, fatigue, and product-specific target ROAS are checked. Target ROAS is not hardcoded; it comes from product economics.</div>
+  <div class="diagram">
+    <h3>Algorithm flowchart</h3>
+    <div class="algobox"><b>Start with one ad or ad set</b>Use the latest performance snapshot and creative metadata.</div>
+    <div class="down">v</div>
+    <div class="algobox"><b>Data quality gate</b>If data is stale, incomplete, or attribution is immature, hold and mark the issue.</div>
+    <div class="down">v</div>
+    <div class="algobox"><b>Business guardrail gate</b>If inventory is low, campaign is protected, ad is in learning phase, or budget recently changed, hold or route to manual review.</div>
+    <div class="down">v</div>
+    <div class="algobox"><b>Signal maturity gate</b>Check age, spend, impressions, clicks, purchases, and attribution maturity.</div>
+    <div class="down">v</div>
+    <div class="algobox" style="background:#fee2e2;border-color:#fca5a5;"><b>Stop decision</b>If expected ROAS is below target and fatigue or saturation is visible, recommend stop.</div>
+    <div class="down">v</div>
+    <div class="algobox" style="background:#fef3c7;border-color:#fcd34d;"><b>Decrease decision</b>If marginal ROAS is below target but the ad is not a hard stop, recommend a budget decrease.</div>
+    <div class="down">v</div>
+    <div class="algobox" style="background:#dcfce7;border-color:#86efac;"><b>Increase decision</b>If marginal ROAS is above target and frequency is healthy, recommend a capped increase.</div>
+    <div class="down">v</div>
+    <div class="algobox" style="background:#f5f3ff;border-color:#c4b5fd;"><b>Create or hold</b>If a winning pattern is under-covered or fatiguing, create new briefs. Otherwise hold.</div>
+  </div>
+</section>
+
+<section class="page" id="examples">
+  <h2>7. Dataset examples and test cases</h2>
+  <div class="overview"><b>Section overview:</b> These examples are taken from the simulated dataset. They show why the engine does not treat every high-ROAS ad as a scale candidate or every low-ROAS ad as a stop candidate.</div>
+  <table class="tight">
+    <tr><th>Case</th><th>Observed dataset row</th><th>Engine output</th><th>Why the output is correct</th></tr>
+    <tr><td><span class="pill red">Stop</span></td><td>ad_000000 | Home | UGC Reel | Prospecting | spend INR 161,607 | raw ROAS 1.25 | target ROAS 2.62 | marginal ROAS 0.90 | frequency 11.5 | CTR decline 65%</td><td>Stop</td><td>The ad is mature, below target, and saturated. The decision is not based on low ROAS alone.</td></tr>
+    <tr><td><span class="pill amber">Hold</span></td><td>ad_000900 | Apparel | UGC Reel | Retargeting | age 5 days | spend INR 6,491 | raw ROAS 7.43 | true marginal ROAS 1.96 | target ROAS 2.12</td><td>Hold / watchlist</td><td>The ad looks exciting, but it is too young and attribution-immature. Scaling would have been wrong.</td></tr>
+    <tr><td><span class="pill green">Increase</span></td><td>ad_000002 | Beauty | Carousel | Retargeting | raw ROAS 3.00 | expected ROAS 3.50 | marginal ROAS 3.06 | target ROAS 1.90 | frequency 0.7</td><td>Increase with cap</td><td>The ad is mature, marginal return is above target, and frequency does not show saturation.</td></tr>
+  </table>
+  <h3>Pass test cases</h3>
+  <table>
+    <tr><th>Test case</th><th>Expected behavior</th><th>What it proves</th></tr>
+    <tr><td>TC-01: Mature fatigued loser</td><td>Stop ad_000000.</td><td>The engine can stop mature underperformance when fatigue and saturation are visible.</td></tr>
+    <tr><td>TC-02: Immature high-ROAS ad</td><td>Hold ad_000900.</td><td>The engine does not scale a tempting ad before signal and attribution mature.</td></tr>
+    <tr><td>TC-03: Mature scale candidate</td><td>Increase ad_000002 with a cap.</td><td>The engine can scale when marginal return is above target and saturation is low.</td></tr>
+  </table>
+</section>
+
+<section class="page" id="failures">
+  <h2>8. Failed test cases and evaluation</h2>
+  <div class="overview"><b>Section overview:</b> Failed cases show what the system is protecting against. They also show the engine's main tradeoff: it is intentionally conservative in v1: it waits for stronger evidence before scaling, which can skip some good opportunities, but reduces costly wrong moves.</div>
+  <table class="tight">
+    <tr><th>Failed case</th><th>Dataset row</th><th>What failed</th><th>What it shows</th></tr>
+    <tr><td>F-01: Baseline false pause</td><td>ad_000070 | raw ROAS 1.26 | target 1.90 | age 3 days</td><td>A simple ROAS rule would stop an ad that hidden future performance says should not be stopped.</td><td>Average ROAS alone is too brittle. Maturity and attribution gates are necessary.</td></tr>
+    <tr><td>F-02: Baseline wrong scale</td><td>ad_000004 | raw ROAS 2.31 | true marginal ROAS 1.06 | target 1.62</td><td>A simple ROAS rule would increase spend even though true marginal ROAS is below target.</td><td>High platform ROAS can come from retargeting inflation, noise, or small-sample luck.</td></tr>
+    <tr><td>F-03: Engine missed scale</td><td>ad_000012 | true marginal ROAS 2.19 | target 1.62 | frequency 3.43</td><td>The guarded engine holds a row that hidden truth says could scale.</td><td>The engine is safer but conservative. Next iteration should tune thresholds and use controlled scale tests.</td></tr>
+  </table>
+  <table>
+    <tr><th>Metric</th><th>Simple ROAS rule</th><th>Guarded engine</th><th>Read</th></tr>
+    <tr><td>False pause rate</td><td>16.8%</td><td>1.5%</td><td>Fewer ads stopped before recovery.</td></tr>
+    <tr><td>Wrong scale rate</td><td>8.2%</td><td>5.4%</td><td>Fewer noisy or inflated ads scaled.</td></tr>
+    <tr><td>Missed scale rate</td><td>10.2%</td><td>34.8%</td><td>The guarded engine is more conservative in v1.</td></tr>
+    <tr><td>Stop recommendations</td><td>22,026</td><td>9,888</td><td>Fewer hard pauses.</td></tr>
+    <tr><td>Increase recommendations</td><td>83,193</td><td>39,703</td><td>Fewer scale calls because maturity and confidence are required.</td></tr>
+  </table>
+  <p>The simulator is not a claim of live revenue lift. It is a test harness for known failure modes. Real validation would require account data, margin data, inventory data, and eventually an online holdout or lift test.</p>
+</section>
+
+<section class="page" id="architecture">
+  <h2>9. Architecture</h2>
+  <div class="overview"><b>Section overview:</b> The architecture keeps the deterministic decision engine separate from the AI layer. If AI fails, recommendations still render. If data fails, action is blocked.</div>
+  <div class="diagram">
+    <h3>System architecture diagram</h3>
+    <div class="archrow">
+      <div class="archbox"><b>Meta data</b>Insights, delivery, creative, spend, conversion data</div><div class="arrow">-></div>
+      <div class="archbox"><b>Ingestion</b>Snapshots, freshness checks, normalization</div><div class="arrow">-></div>
+      <div class="archbox"><b>Feature layer</b>Maturity, trends, target ROAS, fatigue</div><div class="arrow">-></div>
+      <div class="archbox"><b>Decision engine</b>Rules, guardrails, confidence, actions</div>
+    </div>
+    <div class="sidecar"><b>AI sidecar</b><br>Creative classification, creative briefs, and explanations from audit fields. No budget authority.</div>
+    <div class="archrow" style="grid-template-columns: 1fr 28px 1fr 28px 1fr 28px 1fr; margin-top: 14px;">
+      <div class="archbox"><b>Recommendation store</b>Snapshot id, rule version, metrics, confidence, reason codes</div><div class="arrow">-></div>
+      <div class="archbox"><b>Slack/email notification</b>One simple review message with action, reason, and approval link</div><div class="arrow">-></div>
+      <div class="archbox"><b>Human approval</b>Approve, reject, export, snooze, review high-risk</div><div class="arrow">-></div>
+      <div class="archbox"><b>Optional writeback</b>Only after calibration and approval flow are proven</div>
+    </div>
+  </div>
+  <div class="diagram">
+    <h3>Failure-handling diagram</h3>
+    <div class="failrow">
+      <div class="failbox"><b>Data stale</b><br>Exclude affected rows and annotate digest.</div><div class="arrow">-></div>
+      <div class="failbox"><b>AI output invalid</b><br>Retry once, then fallback to deterministic text.</div><div class="arrow">-></div>
+      <div class="failbox"><b>Business context missing</b><br>Lower confidence or route to manual review.</div>
+    </div>
+    <div class="failrow">
+      <div class="failbox"><b>Inventory low</b><br>Block scale even if ROAS looks strong.</div><div class="arrow">-></div>
+      <div class="failbox"><b>Promo active</b><br>Use promo-aware baseline or reduce confidence.</div><div class="arrow">-></div>
+      <div class="failbox"><b>LLM invents metric</b><br>Reject explanation unless metric exists in audit log.</div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="production">
+  <h2>10. AI boundary and production readiness</h2>
+  <div class="overview"><b>Section overview:</b> AI is useful for creative interpretation and explanation, but financial control stays deterministic and auditable.</div>
+  <div class="grid2">
+    <div class="card"><h3>AI is used for</h3><ul><li>Classifying creative patterns such as UGC testimonial, product demo, comparison, routine simplification, or offer-led ad.</li><li>Generating creative briefs from proven product, audience, and creative patterns.</li><li>Writing Slack or email explanations from stored audit fields.</li></ul></div>
+    <div class="card"><h3>AI is not used for</h3><ul><li>Deciding whether to stop, decrease, increase, or hold.</li><li>Predicting ROAS directly.</li><li>Executing changes in Meta.</li><li>Inventing metrics or overriding guardrails.</li></ul></div>
+  </div>
+  <h3>Simple Slack / email notification</h3>
+  <div class="code">Subject: Meta ads recommendation - review 3 actions
+
+Highest-impact action: STOP ad_000000
+Reason: Mature underperformance with high frequency, CTR decline, and marginal ROAS below target.
+
+Also flagged: 1 capped scale candidate and 1 watchlist item.
+Action: Open dashboard to approve, reject, or snooze.</div>
+  <h3>Production readiness</h3>
+  <p>The first version should use read-only Meta access. Write credentials should be separate and enabled only after the approval system exists. Secrets should live in a secret manager. The LLM should receive aggregated metrics and creative text, not user-level purchase logs, customer emails, phone numbers, payment data, or raw customer identifiers.</p>
+  <p>Before deployment, I would confirm the real objective, margin and refund data, inventory and promo context, attribution window, protected campaigns, and the daily budget movement threshold that requires human approval.</p>
+  <div class="warn"><b>Closing position:</b> The right first version is not a fully autonomous ad buyer. It is a reliable recommendation layer that can be inspected, challenged, and calibrated before low-risk execution is automated.</div>
+</section>
+
+</body>
+</html>

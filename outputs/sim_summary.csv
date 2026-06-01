@@ -1,0 +1,16 @@
+,value
+campaigns,10000.0
+ads,120000.0
+mature_ads,84852.0
+naive_stop_count,22122.0
+engine_stop_count,10122.0
+naive_increase_count,83021.0
+engine_increase_count,39758.0
+engine_decrease_count,5601.0
+naive_false_pause_rate,16.178464876593438
+engine_false_pause_rate,1.6597510373443984
+naive_wrong_scale_rate,8.678527119644427
+engine_wrong_scale_rate,5.666784043462951
+naive_missed_scale_rate,10.12691914022518
+engine_missed_scale_rate,34.49744114636643
+engine_skip_rate,53.76583333333333

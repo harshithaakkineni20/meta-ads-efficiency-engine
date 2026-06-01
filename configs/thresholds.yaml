@@ -1,0 +1,9 @@
+# Demo thresholds. In production these would be calibrated by product group.
+minimum_age_days: 7
+minimum_spend_7d_inr: 6500
+minimum_purchases_7d: 8
+scale_budget_cap_pct: 15
+trim_budget_cap_pct: 20
+prospecting_frequency_scale_cap: 2.8
+retargeting_frequency_scale_cap: 4.2
+cooldown_hours_after_budget_change: 48
