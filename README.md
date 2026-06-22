@@ -4,7 +4,7 @@ A simulated decision engine for improving Meta ads efficiency across a high-volu
 
 ## What this project does
 
-The assignment describes a customer running roughly 10,000 Facebook and Instagram campaigns per month and asks for a system to improve ROAS. Because no real account dataset was provided, this repo includes a simulator that creates Meta-style ad data and hidden ground truth.
+The project describes a customer running roughly 10,000 Facebook and Instagram campaigns per month and asks for a system to improve ROAS. Because no real account dataset was provided, this repo includes a simulator that creates Meta-style ad data and hidden ground truth.
 
 The engine only sees observed attributed performance, similar to what an operator would see from Meta. The evaluator sees hidden future and marginal ROAS, which makes it possible to test whether recommendations are directionally right.
 
